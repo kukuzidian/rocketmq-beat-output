@@ -73,29 +73,7 @@ go build -o packetbeat packetbeat.go
 
 ### Configurations
 
-#### Client
-|Name|Description|Default|
-|---|---|---|
-|url| Configure the service URL for the rocketmq service |rocketmq://localhost:6650|
-|certificate_path| path of tls cert file |""|
-|private_key_path| path of tls key file |""|
-|use_tls| Whether to turn on TLS, if to start, use protocol rocketmq+ssl |false|
-|token| Access token information of cluster | "" |
-|token_file_path| The file path where token is saved | "" |
 
-
-#### Producer
-|Name|Description|Default|
-|---|---|---|
-|topic| Specify the topic this producer will be publishing on. |""|
-|name| Specify a name for the producer |""|
-|send_timeout| Set the send timeout |30s|
-|block_if_queue_full| Set whether the send and sendAsync operations should block when the outgoing message queue is full. |false|
-|batching_max_messages| maximum number of messages in a batch |1000|
-|batching_max_publish_delay| the batch delay |1ms|
-|message_routing_mode| the message routing mode, SinglePartition,RoundRobinPartition, CustomPartition(0,1,2) |1|
-|hashing_schema| JavaStringHash,Murmur3_32Hash(0,1) |0|
-|compression_type| NONE,LZ4,ZLIB,ZSTD(0,1,2,3) |0|
 
 ### FAQ
 
