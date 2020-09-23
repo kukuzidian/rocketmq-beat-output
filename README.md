@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 ## Beat Output Pulsar
 
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://www.apache.org/licenses/LICENSE-2.0)
@@ -192,3 +193,5 @@ chown -R root:root filebeat.yml
 
 ## License
 [![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fstreamnative%2Fpulsar-beat-output.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2Fstreamnative%2Fpulsar-beat-output?ref=badge_large)
+# rocketmq-beat-output
+扩展filebeat支持rocketmq作为输出下游
