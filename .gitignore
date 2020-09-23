@@ -9,7 +9,8 @@
 /*/*.template*.json
 **/html_docs
 /*/_meta/kibana.generated
-
+.github
+.gore
 # Files
 .DS_Store
 /beats.iml
