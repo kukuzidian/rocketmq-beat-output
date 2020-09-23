@@ -20,42 +20,15 @@
 package main
 
 import (
-    //"github.com/elastic/beats/v7/filebeat/cmd"
-    _ "github.com/kukuzidian/rocketmq-beat-output/rocketmq"
-    //inputs "github.com/elastic/beats/v7/filebeat/input/default-inputs"
     "github.com/elastic/beats/x-pack/filebeat/cmd"
+    _ "github.com/kukuzidian/rocketmq-beat-output/rocketmq"
     "os"
-
-    "fmt"
 )
 
 func main() {
-    fmt.Println("-----start")
 
     if err := cmd.RootCmd.Execute(); err != nil {
        os.Exit(1)
     }
-    fmt.Println("-----end")
 
-    /*p,_ := rocketmq.NewProducer(producer.WithNameServer(primitive.NamesrvAddr{"172.16.14.128:9876"}),
-        producer.WithRetry(3),
-        producer.WithGroupName("testest"))
-
-    p.Start()
-
-    for i:=1;i<=2000;i++ {
-        msg := &primitive.Message{
-            Topic: "beat_topic",
-            Body:  []byte("serializedEvent1230000000000000000--"+string(i)),
-        }
-        res, err := p.SendSync(context.Background(), msg)
-
-        if err != nil {
-            fmt.Printf("send message error: %s\n", err)
-        } else {
-            fmt.Printf("send message success: result=%s\n", res.String())
-        }
-    }
-
-    p.Shutdown()*/
 }
