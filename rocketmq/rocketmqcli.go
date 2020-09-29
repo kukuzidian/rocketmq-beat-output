@@ -3,10 +3,11 @@ package rocketmq
 import (
 	"context"
 	"github.com/apache/rocketmq-client-go/v2/producer"
-
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	"strconv"
+	"time"
 
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/beats/v7/libbeat/outputs/codec"
@@ -28,6 +29,7 @@ type rocketmqcli struct {
 	observer outputs.Observer
 	codec    codec.Codec
 	log      *logp.Logger
+	tag string
 }
 
 func init()  {
@@ -43,8 +45,9 @@ func (r *rocketmqcli) Publish(ctx context.Context, batch publisher.Batch) error 
 	defer batch.ACK()
 	events := batch.Events()
 	r.observer.NewBatch(len(events))
-	r.log.Info("rocketmq", "Pulsar received events: %d", len(events))
+	r.log.Debug("rocketmq", "Pulsar received events: %d", len(events))
 
+	var slicearr = make([]string,1,1)
 	dropped := 0
 	for i := range events{
 		event := &events[i]
@@ -66,6 +69,10 @@ func (r *rocketmqcli) Publish(ctx context.Context, batch publisher.Batch) error 
 			Topic: r.topic,
 			Body:  []byte(serializedEvent),
 		}
+		msg = msg.WithTag(r.tag)
+		//msg = msg.WithShardingKey(time.Now().String())
+		slicearr[0] = strconv.FormatInt(time.Now().UnixNano()/1000,10)
+		msg = msg.WithKeys(slicearr)
 		res, err := r.rmqproducer.SendSync(context.Background(), msg)
 
 		if err != nil {
@@ -136,11 +143,13 @@ func (r *rocketmqcli) initConfig(info beat.Info,c rocketmqConfig) error {
 
 	r.maxmessagesize = c.MaxMessageSize
 	r.compressmessagesize = c.CompressMessageSize
+	r.tag = c.Tag
 
 	r.rmqproducer, err = rocketmq.NewProducer(
 		producer.WithNsResovler(primitive.NewPassthroughResolver([]string{c.NameSrvAddr})),
 		producer.WithRetry(2),
 		producer.WithCreateTopicKey(c.Topic),
+		producer.WithGroupName(c.GroupName),
 	)
 
 	if err != nil {

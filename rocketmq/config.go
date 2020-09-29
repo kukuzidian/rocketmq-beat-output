@@ -12,6 +12,8 @@ type rocketmqConfig struct {
 	MaxMessageSize uint32 `config:"maxmessagesize"`
 	CompressMessageSize uint32 `config:"compressmessagesize"`
 	Codec codec.Config `config:"codec"`
+	GroupName string `config:"groupName"`
+	Tag string `config:"tag"`
 }
 
 
@@ -23,6 +25,8 @@ func defaultConfig() rocketmqConfig{
 		Retry:               2,
 		MaxMessageSize:      10 * 1024 * 1024,
 		CompressMessageSize: 4 * 1024,
+		GroupName: "defaultGroup",
+		Tag: "",
 	}
 }
 
