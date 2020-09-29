@@ -46,7 +46,10 @@ go build -o filebeat main.go
 ```
 output.rocketmq:
   namesrvaddr: "172.16.14.128:9876"
-  topic: beat_topic
+  topic: "beat_topic"
+  groupName: "filebeatProducer"
+  producename: "producename"
+  tag: "A1"
   enabled: true
   codec.json:
     pretty: false
