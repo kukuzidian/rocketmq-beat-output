@@ -8,12 +8,13 @@ type rocketmqConfig struct {
 	ProduceName string `config:"producename"`
 	NameSrvAddr string `config:"namesrvaddr" validate:"required"`
 	Topic string `config:"topic" validate:"required"`
-	Retry uint `config:"retry"`
+	Retry int `config:"retry"`
 	MaxMessageSize uint32 `config:"maxmessagesize"`
 	CompressMessageSize uint32 `config:"compressmessagesize"`
 	Codec codec.Config `config:"codec"`
 	GroupName string `config:"groupName"`
 	Tag string `config:"tag"`
+	BatchSize int `config:"batchsize"`
 }
 
 
@@ -27,6 +28,7 @@ func defaultConfig() rocketmqConfig{
 		CompressMessageSize: 4 * 1024,
 		GroupName: "defaultGroup",
 		Tag: "",
+		BatchSize: 2048,
 	}
 }
 

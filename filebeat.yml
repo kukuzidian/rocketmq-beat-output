@@ -163,6 +163,7 @@ output.rocketmq:
   groupName: "filebeatProducer"
   producename: "producename"
   tag: "A1"
+  batchsize: 10000
   enabled: true
   codec.json:
     pretty: false

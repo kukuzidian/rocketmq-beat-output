@@ -45,9 +45,10 @@ func (r *rocketmqcli) Publish(ctx context.Context, batch publisher.Batch) error 
 	defer batch.ACK()
 	events := batch.Events()
 	r.observer.NewBatch(len(events))
-	r.log.Debug("rocketmq", "Pulsar received events: %d", len(events))
-
+	r.log.Warn("rocketmq", "Rocketmq received events: %d", len(events))
+	cnt :=1000
 	var slicearr = make([]string,1,1)
+	var tmpslice = make([]*primitive.Message,0,cnt)
 	dropped := 0
 	for i := range events{
 		event := &events[i]
@@ -73,8 +74,22 @@ func (r *rocketmqcli) Publish(ctx context.Context, batch publisher.Batch) error 
 		//msg = msg.WithShardingKey(time.Now().String())
 		slicearr[0] = strconv.FormatInt(time.Now().UnixNano()/1000,10)
 		msg = msg.WithKeys(slicearr)
-		res, err := r.rmqproducer.SendSync(context.Background(), msg)
 
+		tmpslice = append(tmpslice, msg)
+		if len(tmpslice) == cnt {
+			res, err := r.rmqproducer.SendSync(context.Background(), tmpslice...)
+			if err != nil {
+				r.log.Error("send message error: %s\n", err)
+			} else {
+				r.log.Debug("send message success: result=%s\n", res.String())
+			}
+			//tmpslice = make([]*primitive.Message,0,cnt)
+			tmpslice = tmpslice[0:0]
+		}
+
+	}
+	if len(tmpslice) > 0 {
+		res, err := r.rmqproducer.SendSync(context.Background(), tmpslice...)
 		if err != nil {
 			r.log.Error("send message error: %s\n", err)
 		} else {
@@ -90,6 +105,13 @@ func (r *rocketmqcli) String() string {
 	//panic("implement me")
 	return "rocketmq topic="+r.topic
 }
+
+//func cleardata(t []*primitive.Message) []*primitive.Message {
+//	for i:=0 ; i < len(t) ; i++ {
+//		t[i] = nil
+//	}
+//	return t
+//}
 
 func makeRocketmq(
 	_ outputs.IndexManager,
@@ -129,7 +151,7 @@ func makeRocketmq(
 	}else{
 		rmq.log.Info("---rmqproducer started success! ")
 	}
-	return outputs.Success(10,3,rmq)
+	return outputs.Success(config.BatchSize,config.Retry,rmq)
 }
 
 func (r *rocketmqcli) initConfig(info beat.Info,c rocketmqConfig) error {
@@ -145,8 +167,15 @@ func (r *rocketmqcli) initConfig(info beat.Info,c rocketmqConfig) error {
 	r.compressmessagesize = c.CompressMessageSize
 	r.tag = c.Tag
 
+	nsraddr , err := primitive.NewNamesrvAddr(c.NameSrvAddr)
+	if err != nil {
+		r.log.Error("rocketmq NameSrvAddr init error !")
+		return err
+	}
+
 	r.rmqproducer, err = rocketmq.NewProducer(
-		producer.WithNsResovler(primitive.NewPassthroughResolver([]string{c.NameSrvAddr})),
+		//producer.WithNsResovler(primitive.NewPassthroughResolver([]string{c.NameSrvAddr})),
+		producer.WithNameServer(nsraddr),
 		producer.WithRetry(2),
 		producer.WithCreateTopicKey(c.Topic),
 		producer.WithGroupName(c.GroupName),
